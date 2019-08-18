@@ -99,7 +99,7 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
     for col in category_names:
         print(col)
-        print(classification_report(y_test[col], y_pred[col]))  
+        print(classification_report(Y_test[col], y_pred[col]))  
 
 
 def save_model(model, model_filepath):
