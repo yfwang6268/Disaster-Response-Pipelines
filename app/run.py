@@ -11,6 +11,38 @@ from plotly.graph_objs import Bar
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
 
+# import libraries
+import nltk
+import re
+nltk.download(['punkt','wordnet','averaged_perceptron_tagger'])
+
+from sqlalchemy import create_engine
+
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, GridSearchCV
+
+import pickle
+
+class StartingVerbExtractor(BaseEstimator, TransformerMixin):
+    
+    def starting_verb(self, text):
+        sentence_list = ltk.sent_tokenize(text)
+        for sentence in sentence_list:
+            pos_tags = nltk.pos_tag(tokenize(sentence))
+            first_work, first_tag = pos_tags[0]
+            if first_tag in ['VB','VBP'] or first_word == 'RT':
+                return True
+        return False
+    
+    def fit(self, x, y=None):
+        return self
+    
+    def transform(self, X):
+        X_tagged = pd.Series(X).apply(self.starting_verb)
+        return pd.DataFrame(X_tagged)
 
 app = Flask(__name__)
 
@@ -26,11 +58,12 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///../data/YourDatabaseName.db')
-df = pd.read_sql_table('YourTableName', engine)
+engine = create_engine('sqlite:///data/DisasterResponse.db')
+df = pd.read_sql_table('data/DisasterResponse.db', engine)
 
 # load model
-model = joblib.load("../models/your_model_name.pkl")
+# model = joblib.load("../models/your_model_name.pkl")
+model = pickle.load(open('models/classifier.pkl', 'rb'))
 
 
 # index webpage displays cool visuals and receives user input text for model
