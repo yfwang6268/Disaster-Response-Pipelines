@@ -29,10 +29,10 @@ import pickle
 class StartingVerbExtractor(BaseEstimator, TransformerMixin):
     
     def starting_verb(self, text):
-        sentence_list = ltk.sent_tokenize(text)
+        sentence_list = nltk.sent_tokenize(text)
         for sentence in sentence_list:
             pos_tags = nltk.pos_tag(tokenize(sentence))
-            first_work, first_tag = pos_tags[0]
+            first_word, first_tag = pos_tags[0]
             if first_tag in ['VB','VBP'] or first_word == 'RT':
                 return True
         return False
@@ -58,12 +58,12 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///data/DisasterResponse.db')
+engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('data/DisasterResponse.db', engine)
 
 # load model
 # model = joblib.load("../models/your_model_name.pkl")
-model = pickle.load(open('models/classifier.pkl', 'rb'))
+model = pickle.load(open('../models/classifier.pkl', 'rb'))
 
 
 # index webpage displays cool visuals and receives user input text for model
