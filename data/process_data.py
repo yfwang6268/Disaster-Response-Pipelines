@@ -8,6 +8,16 @@ import re
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+
+    '''
+    inputs:
+       - messages_filepath: the file path of messages.csv
+       - categories_filepath: the file path of categories.csv
+
+    Outputs:
+       - df: the dataframe that contains each messages and categories
+    
+    '''
     # load messages dataset
     messages = pd.read_csv(messages_filepath, dtype = str)
     categories = pd.read_csv(categories_filepath,dtype = str)
@@ -36,6 +46,13 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    '''
+    inputs:
+       - df: the dataframe contains messages and categories
+    Outputs:
+       - df: the dataframe after removing duplicated and na value and correcting wrong information
+    
+    '''
     # drop duplicates
     df.drop(df[df.duplicated() == True].index,axis = 0,inplace = True)
     # drop the redundent column 'original'
@@ -49,12 +66,21 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+     '''
+     This function is to save the data into SQL database
+     inputs: 
+        -df: the dataframe want to save
+        -database_filename: the file name with file path
+     outputs: null
+     '''
+    
     engine = create_engine('sqlite:///' + database_filename)
     df.to_sql(database_filename, con=engine, index=False)
     pass  
 
 
 def main():
+    
     if len(sys.argv) == 4:
 
         messages_filepath, categories_filepath, database_filepath = sys.argv[1:]
