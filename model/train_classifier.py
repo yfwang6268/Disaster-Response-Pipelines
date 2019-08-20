@@ -21,6 +21,14 @@ from sklearn.metrics import classification_report
 import pickle
 
 def load_data(database_filepath):
+    '''
+    input:
+        - database_filepath: the database filepath in string format
+    output:
+        - X: messages inforamtion 
+        - Y: categories of each information
+        - column_names: the unique category names
+    '''
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table(database_filepath, engine)
     X = df['message']
@@ -30,6 +38,12 @@ def load_data(database_filepath):
     return X, Y, column_names
 
 def tokenize(text):
+    '''
+    Input：
+        - text: the message information in string format
+    output
+        - clean_tokens: the tokens after transfering , tokenizing and lemmmatizing messages
+    '''
     url_regex =  'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
     detected_urls = re.findall(url_regex, text)
     # replace each url in text string with placeholder
@@ -51,8 +65,20 @@ def tokenize(text):
     return clean_tokens
 
 class StartingVerbExtractor(BaseEstimator, TransformerMixin):
+'''
+Input: 
+    - BaseEstimator: BaseEstimator importing from sklearn.base
+    - TransformerMixin: TransformerMixin importing from sklearn.base
+'''
     
     def starting_verb(self, text):
+        '''
+        Input:
+            -   text: the text string
+        output:
+            - Boolen value: If the starting word is a verb, return true.
+                            Otherwise, return false
+        '''
         sentence_list = nltk.sent_tokenize(text)
         for sentence in sentence_list:
             pos_tags = nltk.pos_tag(tokenize(sentence))
@@ -65,10 +91,22 @@ class StartingVerbExtractor(BaseEstimator, TransformerMixin):
         return self
     
     def transform(self, X):
+        '''
+        Input:
+            - X: the dataframe contains the messages in each row
+        Output:
+            - pd.DataFrame(X_tagged): the dataframe with boolen value indicating whether the starting word is a verb or not 
+        '''
         X_tagged = pd.Series(X).apply(self.starting_verb)
         return pd.DataFrame(X_tagged)
 
 def build_model():
+    '''
+    input:
+      - None
+    output:
+      - the ML pipeline after using GridSearch for selecting optimal parameters
+    '''
     pipeline = Pipeline([
         ('features',FeatureUnion([
             ('text_pipeline',Pipeline([
@@ -91,6 +129,16 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+    The function will print out classification report with accuracy for each categories
+    input:
+        - model: the ML pipeline
+        - X_test: messages testing dataset
+        - Y_test: category testing dataset
+        - category_names: all unique category names
+    output:
+        - None
+    '''
     y_pred = model.predict(X_test)
     y_pred = pd.DataFrame(y_pred)
     y_pred.columns = category_names
@@ -101,6 +149,14 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''
+    The funcation will save the model in target path
+    Input:
+        - model: the pipeline we want to save
+        - model_filepath: the path we want to save the pipeline
+    Output:
+        - None
+    '''
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
