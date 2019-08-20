@@ -2,8 +2,9 @@
 update run.py with below points:
 1. add two plots for data visualtions
 2. correct the typos
+
 Note:
-1. if we change the code following the suggestions as below:
+if we change the code following the suggestions as below:
   1) line 61: 
   You have to go a directory back to read from the data directory. You can do that using two dots .. like this sqlite:///../data/DisasterResponse.db.
   2) line 66:
